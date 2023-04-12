@@ -30,6 +30,8 @@ indicator is shown, you loose.
 - (TBD) button hold timeout
 - Game auto resetarts after a win or loss
 - Easiliy modifiable code by using the parameters defined below.
+Changelog
+- Visual feedback now during button click, and no loss on viusal feedback loop.
 */
 #include <Arduino.h>
 
@@ -135,15 +137,6 @@ void loop() {
         check = button_Check(); 
         if (check < OPTIONS)
         {
-          if (!(visual_Feedback(check)))
-              {
-                Serial.println("Lost");
-                termination(13);
-                level_Change();
-                i = LEVELS;
-                count_User_Inputs = LEVELS;
-                break;
-              }
           if (check != generated_Level[count_User_Inputs])
           {
             //make this terminate the whole ting
@@ -239,12 +232,14 @@ int button_Check(){
   {
     if (digitalRead(i + BUTTON_SEQUENCE_START))
     {
+      /*Give visual feedback here and not anywhere random, turn it off after delay gone*/
       //Debounce
+      digitalWrite(i + LED_SEQUENCE_START, 1);
       while (millis() - timer < DEBOUNCE || digitalRead(i + BUTTON_SEQUENCE_START))
       {
         true;
       }
-      
+      digitalWrite(i + LED_SEQUENCE_START, 0);
       
       return i;
     }
@@ -296,25 +291,5 @@ bool level_Change(){
     }
     
   }
-  return true;
-}
-
-bool visual_Feedback(int pin){
-  unsigned long int timer = millis();
-  for (int state = 1; state >= 0; state--)
-  {
-    digitalWrite(pin + LED_SEQUENCE_START, state);
-    while (millis() - timer < LED_TIME / 2)
-    {
-      /*Return false if the button is pressed between the feedback*/
-      if (button_Check() < OPTIONS)
-      {
-        return false;
-      }
-      
-    }
-    
-  }
-  
   return true;
 }
