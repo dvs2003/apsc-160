@@ -99,6 +99,7 @@ void loop() {
     Serial.print(" ");
   }
   Serial.print("\n");
+  /*Remove this delay in a bit*/
   delay(1000);
   for (int i = 0; i < LEVELS; i++)
   {
