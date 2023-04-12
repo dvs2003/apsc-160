@@ -232,7 +232,7 @@ bool display_Pattern(int current_Level, int* array){
   
   return true;
 }
-
+/*Make a function for is valis*/
 int button_Check(){
   unsigned long int timer = 0;
   for (int i = 0; i < OPTIONS; i++)
