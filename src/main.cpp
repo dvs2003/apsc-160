@@ -34,7 +34,7 @@ indicator is shown, you loose.
 #include <Arduino.h>
 
 /*Parameters of the game*/
-#define LEVELS 2                  //MAX numebr of LEVELS
+#define LEVELS 5                  //MAX numebr of LEVELS
 #define OPTIONS 4                 //Number of LEDs and BUTTONs
 #define LED_SEQUENCE_START 9      //The SEQUENCE of LED PINS start from this pin
 #define BUTTON_SEQUENCE_START 4   //The SEQUENCE of BUTTON PINS start from this pin
