@@ -87,12 +87,13 @@ void setup() {
 }
 
 void loop() {
-  //delay(1000);
   Serial.println("A new Game has begun.");
   delay(500);
-  /*Start each iteration by generating a new level*/
+  /*Start each GAME iteration by GENERATING a new LEVEL*/
   generate_Level(LEVELS, generated_Level, OPTIONS);
+  /*Delay for debugging, remove it*/
   delay(500);
+  /*Displaying the generated LEVEL to the SERIAL port*/
   for (int i = 0; i < LEVELS; i++)
   {
     Serial.print(generated_Level[i]);
@@ -101,11 +102,10 @@ void loop() {
   Serial.print("\n");
   /*Remove this delay in a bit*/
   delay(1000);
+  /*START of MAIN GAME LOOP*/
   for (int i = 0; i < LEVELS; i++)
   {
-    Serial.print("level : ");
-    Serial.print(i);
-    Serial.println("\n");
+    /*Continue to USER INPUT STAGE if user hasn't lost in the PATTERN DISPLAY STAGE*/
     if (!(display_Pattern(i, generated_Level)))
     {
       termination(13);
@@ -113,11 +113,13 @@ void loop() {
       break;
     }
     else{
-      //AFK
+      //AFK Reset
       count_User_Inputs = 0;
       afk_Timer = millis();
+      /*Loop to take USER INPUT from buttons*/
       while (count_User_Inputs <= i)
       {
+        /*AFK TIMEOUT -> LOOSE*/
         if (millis() - afk_Timer > TIMEOUT)
         {
           Serial.println("Timeout.");
@@ -136,8 +138,16 @@ void loop() {
         }
         
         check = button_Check(); 
+        /*
+        VALIS INPUTS include 0, 1, 2, 3;
+        OPTIONS constant is one above that range 
+        and is the default return of the button check
+        So it will only check for right and wrong
+        if a button press is detected.
+        */
         if (check < OPTIONS)
         {
+          /*Check if the button pushed is currect corruspoding to the generated array*/
           if (check != generated_Level[count_User_Inputs])
           {
             //make this terminate the whole ting
@@ -149,13 +159,12 @@ void loop() {
           }
           else
           {
-            
+            /*If the loop is at the last input of each level*/
             if (count_User_Inputs == i)
             {
-      
-              
               Serial.println("Level Passed\n");
               level_Change();
+              /*LAST INPUT of the LAST LEVEL*/
               if (i == LEVELS - 1)
               {
                 termination(8);
@@ -168,6 +177,10 @@ void loop() {
             }
             else
             {
+              /*
+              If the loop hasnt terminated the input was 
+              valid and the level hasnt ended
+              */
               Serial.println("Valid Input\n");
               afk_Timer = millis();
               count_User_Inputs ++;
@@ -187,7 +200,7 @@ void loop() {
   }
   Serial.println("Game Ended!");
 }
-
+/*Generate an array with random values and options number of elements*/
 bool generate_Level(int count, int* array, int options){
   while (count-- > 0)
   {
@@ -196,23 +209,28 @@ bool generate_Level(int count, int* array, int options){
 
   return true;
 }
-
+/*Display the pattern of LEDs at the start of each level*/
 bool display_Pattern(int current_Level, int* array){
   unsigned long int timer;
+  /*Loop through each LED in the level*/
   for (int i = 0; i <= current_Level; i++)
   {
-    Serial.print("This is Loop : ");
-    Serial.print(i);
-    Serial.print("\n");
+    /*
+    The state goes from 1 to 0, turning the LED ON then OFF
+    With a delay using the while loop that checks for pre mature input
+    */
     for (int state = 1; state >= 0; state--)
     {
       Serial.print("LED State ");
       Serial.print(state);
       Serial.print("\n");
+      /*Write the corresponding LED a STATE ON then OFF*/
       digitalWrite(array[i] + LED_SEQUENCE_START, state);
       timer = millis();
+      /*DELAY*/
       while (millis() - timer < LED_TIME)
       {
+        /*Checking for user INPUT in between the SEQUENCE GENERATION*/
         if (button_Check() < OPTIONS)
         {
           Serial.println("LOST THE GAME!");
@@ -227,15 +245,17 @@ bool display_Pattern(int current_Level, int* array){
   return true;
 }
 /*Make a function for is valis*/
+/*Check which button has been pressed and give visual feedback*/
 int button_Check(){
   unsigned long int timer = 0;
   for (int i = 0; i < OPTIONS; i++)
   {
+    /*Looping through each button chekcing for input*/
     if (digitalRead(i + BUTTON_SEQUENCE_START))
     {
-      /*Give visual feedback here and not anywhere random, turn it off after delay gone*/
       //Debounce
       digitalWrite(i + LED_SEQUENCE_START, 1);
+      /*Debounce along with long hold*/
       while (millis() - timer < DEBOUNCE || digitalRead(i + BUTTON_SEQUENCE_START))
       {
         true;
@@ -248,7 +268,7 @@ int button_Check(){
   }
   return OPTIONS;
 }
-/*These two functions are just for displaying LED in a different style*/
+/*The next 2 functions are just for displaying LED in a different style*/
 int termination(int LED){
   unsigned long int timer = 0;
 
@@ -271,7 +291,7 @@ int termination(int LED){
 
   return 0;
 }
-
+/*Turns on all the LEDs and then Turns them off.*/
 bool level_Change(){
   unsigned long int timer = 0;
   int button = 0;
