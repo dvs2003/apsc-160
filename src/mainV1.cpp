@@ -62,6 +62,20 @@ int check_for_button(){
     
     return LEDS;
 }
+
+int allFlash(){
+    for (int i = 0; i < LEDS; i++)
+    {
+        digitalWrite(LED_START + i, HIGH);
+    }
+    delay(500);
+    for (int i = 0; i < LEDS; i++)
+    {
+        digitalWrite(LED_START + i, LOW);
+    }
+    
+    
+}
 void loop(){
     int array[LEDS] = { 0 };
     int level = 0;
@@ -71,7 +85,7 @@ void loop(){
     {
         if (!showLeds(level, array))
         {
-            /* lost */
+            allFlash();
             break;
         }
 
@@ -83,7 +97,7 @@ void loop(){
             while (numUSERinputs <= level)
             {
                 if(millis() - timeout > 10000){
-                    //Lost
+                    allFlash();
                     level = LEVELS;
                     numUSERinputs = LEVELS;
                     break;
@@ -94,6 +108,7 @@ void loop(){
                 if (button != array[numUSERinputs])
                 {
                     level = LEVELS;
+                    allFlash();
                     break;
                     //LOST
                 }
@@ -107,11 +122,13 @@ void loop(){
                         {
                             Serial.println("Won");
                             //leds on and off
+                            allFlash();
                         }
                         break;
                     }
                     else
                     {
+                        allFlash();
                         timeout = millis();
                         numUSERinputs ++;
                     }
@@ -125,10 +142,5 @@ void loop(){
         
         
     }
-    /*
-    Rewrite the positioning of one of the logics
-    */
-    
-
     true;
 }
