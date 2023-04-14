@@ -4,7 +4,8 @@
 #define LEDS 4
 #define LED_START 9
 #define BUTTON_START 4
-
+#define greenLED 8
+#define redLED 13
 void setup(){
     true;
     /*Code*/
@@ -76,6 +77,18 @@ int allFlash(){
     
     
 }
+
+int won(){
+    digitalWrite(greenLED, HIGH);
+    delay(1000);
+    digitalWrite(greenLED, LOW);
+}
+
+int lost(){
+    digitalWrite(redLED, HIGH);
+    delay(1000);
+    digitalWrite(redLED, LOW);
+}
 void loop(){
     int array[LEDS] = { 0 };
     int level = 0;
@@ -85,6 +98,7 @@ void loop(){
     {
         if (!showLeds(level, array))
         {
+            lost();
             allFlash();
             break;
         }
@@ -97,6 +111,7 @@ void loop(){
             while (numUSERinputs <= level)
             {
                 if(millis() - timeout > 10000){
+                    lost();
                     allFlash();
                     level = LEVELS;
                     numUSERinputs = LEVELS;
@@ -108,6 +123,7 @@ void loop(){
                 if (button != array[numUSERinputs])
                 {
                     level = LEVELS;
+                    lost();
                     allFlash();
                     break;
                     //LOST
@@ -121,6 +137,7 @@ void loop(){
                         if (level == LEVELS - 1)
                         {
                             Serial.println("Won");
+                            won();
                             //leds on and off
                             allFlash();
                         }
